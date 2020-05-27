@@ -1,5 +1,6 @@
 <template>
   <div id="app">
+    <h1>新型コロナ陽性患者数の推移</h1>
     <chart></chart>
   </div>
 </template>

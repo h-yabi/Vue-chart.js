@@ -2,6 +2,7 @@
 <script>
 import { Bar } from 'vue-chartjs';
 import axios from 'axios';
+import moment from 'moment'
 
 export default {
   extends: Bar,
@@ -9,37 +10,24 @@ export default {
   data () {
     return {
       data: {
-        labels: ['January', 'February', 'March', 'April', 'May', 'June'],
+        labels: [],
         datasets: [
           {
-            label: 'Bar Dataset',
-            data: [10, 20, 30, 40, 50, 30],
-            backgroundColor: [
-              'rgba(255, 99, 132, 0.2)',
-              'rgba(54, 162, 235, 0.2)',
-              'rgba(255, 206, 86, 0.2)',
-              'rgba(75, 192, 192, 0.2)',
-              'rgba(153, 102, 255, 0.2)',
-              'rgba(255, 159, 64, 0.2)'
-            ],
-            borderColor: [
-              'rgba(255, 99, 132, 1)',
-              'rgba(54, 162, 235, 1)',
-              'rgba(255, 206, 86, 1)',
-              'rgba(75, 192, 192, 1)',
-              'rgba(153, 102, 255, 1)',
-              'rgba(255, 159, 64, 1)'
-            ],
-            borderWidth: 1
+            label: '男性',
+            data: [10, 30, 20, 30, 50, 10],
+            backgroundColor: 'rgba(54, 162, 235, 0.5)',
+            fill: false,
+            type: 'bar',
+            lineTension: 0.3,
           },
           {
-            label: 'Line Dataset',
-            data: [10, 50, 20, 30, 30, 40],
-            borderColor: '#CFD8DC',
+            label: '女性',
+            data: [20, 60, 10, 30, 30, 40],
+            backgroundColor: 'rgba(255, 99, 132, 0.5)',
             fill: false,
-            type: 'line',
+            type: 'bar',
             lineTension: 0.3,
-          }
+          },
         ]
       },
       options: {
@@ -47,35 +35,59 @@ export default {
           xAxes: [{
             scaleLabel: {
               display: true,
-              labelString: 'Month'
+              fontColor: "#999",
+              labelString: "日付（直近30日）"
+            },
+            stacked: true,
+            ticks: {
+              // 下記のように固定値ではなく、
+              // データに応じて算出するのがいいと思います
+              max: 24,
+              stepSize: 4,
             }
           }],
           yAxes: [{
-            ticks: {
-              beginAtZero: true,
-              stepSize: 10,
-            }
+            stacked: true
           }]
-        }
+        },
       }
     }
   },
-  mounted () {
-    this.renderChart(this.data, this.options)
-
-    axios.get('/data/130001_tokyo_covid19_patients.csv').then(response =>{
-      // console.log(response)
+  methods: {
+    setDate (response) {
       // 1行ごとの取得
-      const sample = response.data.split('\n');
-      const name = [sample[0].split(',')]
-      console.log(name)
-      console.log(sample[5])
+      const splitOneLine = response.data.split('\n');
+
+      // 日付を取得
+      let dateArray = []
+      for(let i = 1; i < splitOneLine.length - 1; i++) {
+        dateArray.push(splitOneLine[i].split(',')[4])
+      }
+
+      // 重複を削除
+      const date = dateArray.filter((x, i, self) => {
+        return self.indexOf(x) === i;
+      }).slice(-30);
+
+      // 日付フォーマットを変更
+      const formatDate = date.map(value => {
+        return moment(value, "YYYY-MM-DD").format('M/D')
+      })
+      this.data.labels = formatDate
+    }
+  },
+  mounted () {
+    axios.get('/data/130001_tokyo_covid19_patients.csv')
+    .then(response => {
+      this.setDate(response)
     })
+    .finally(() => {
+      this.renderChart(this.data, this.options)
+    });
   }
 }
 </script>
 
-<!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped>
 
 </style>
