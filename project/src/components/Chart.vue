@@ -1,6 +1,7 @@
 
 <script>
 import { Bar } from 'vue-chartjs';
+import axios from 'axios';
 
 export default {
   extends: Bar,
@@ -61,6 +62,15 @@ export default {
   },
   mounted () {
     this.renderChart(this.data, this.options)
+
+    axios.get('/data/130001_tokyo_covid19_patients.csv').then(response =>{
+      // console.log(response)
+      // 1行ごとの取得
+      const sample = response.data.split('\n');
+      const name = [sample[0].split(',')]
+      console.log(name)
+      console.log(sample[5])
+    })
   }
 }
 </script>
