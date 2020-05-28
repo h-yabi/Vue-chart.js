@@ -58,20 +58,60 @@ export default {
       // 1行ごとの取得
       const splitOneLine = response.data.split('\n');
 
-      // 日付を取得
-      let dateArray = []
+      let array = []
       for(let i = 1; i < splitOneLine.length - 1; i++) {
-        dateArray.push(splitOneLine[i].split(',')[4])
+        array.push({
+          date: splitOneLine[i].split(',')[4],
+          gender: splitOneLine[i].split(',')[9],
+          age: splitOneLine[i].split(',')[8]
+        })
       }
 
-      // 重複を削除
-      const date = dateArray.filter((x, i, self) => {
+      // 日付を取得（直近30日を取得、重複を削除）
+      let dateArray = []
+      array.map((value) => {
+        dateArray.push(value.date)
+      });
+      const latest = dateArray.filter((x, i, self) => {
         return self.indexOf(x) === i;
       }).slice(-30);
 
+      // 直近30日の全てのデータ配列を取得
+      const latestData = array.filter((value) => {
+        return value.date >= latest[0]
+      });
+
+      const group = latestData.reduce((result, current) => {
+        const element = result.find((p) => p.date === current.date);
+        // console.log(element)
+        if (element) {
+          element.count ++; // count
+          element.gender += current.gender; // sum
+        } else {
+          result.push({
+            date: current.date,
+            count: 1,
+            gender: current.gender
+          });
+        }
+        return result;
+      }, []);
+      console.log(group)
+
+      const gender = group.map(value => {
+        return value.gender.match(/.{2}/g)
+      })
+      console.log(gender)
+
+      // const genderTaxonomy = gender.reduce((a, b) => {
+      //   console.log(a + b)
+      // })
+
+
+
       // 日付フォーマットを変更
-      const formatDate = date.map(value => {
-        return moment(value, "YYYY-MM-DD").format('M/D')
+      const formatDate = group.map(value => {
+        return moment(value.date, "YYYY-MM-DD").format('M/D')
       })
       this.data.labels = formatDate
     }
