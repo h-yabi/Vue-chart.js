@@ -3,6 +3,7 @@
 import { Bar } from 'vue-chartjs';
 import axios from 'axios';
 import moment from 'moment'
+import countArray from 'count-array-values';
 
 export default {
   extends: Bar,
@@ -102,6 +103,15 @@ export default {
         return value.gender.match(/.{2}/g)
       })
       console.log(gender)
+
+      // const genderTaxonomy = countArray(gender[0])
+
+      const genderTaxonomy = gender.map(value => {
+        return countArray(value)
+      })
+      console.log(genderTaxonomy)
+
+
 
       // const genderTaxonomy = gender.reduce((a, b) => {
       //   console.log(a + b)
