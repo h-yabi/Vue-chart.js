@@ -49,6 +49,10 @@ export default {
             stacked: true
           }]
         },
+      },
+      headers: {
+          'Content-Type': 'application/json;charset=UTF-8',
+          'Access-Control-Allow-Origin': '*',
       }
     }
   },
@@ -145,13 +149,14 @@ export default {
     }
   },
   mounted () {
-    axios.get('/data/130001_tokyo_covid19_patients.csv')
+    axios.get('/data/130001_tokyo_covid19_patients.csv', this.headers)
     .then(response => {
       this.setData(response)
     })
     .finally(() => {
       this.renderChart(this.data, this.options)
     });
+    axios.defaults.withCredentials = true;
   }
 }
 </script>
