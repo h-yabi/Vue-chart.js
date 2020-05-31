@@ -53,8 +53,9 @@ export default {
     }
   },
   methods: {
-    setDate (response) {
-      // 1行ごとの取得
+    setData (response) {
+
+      // csvファイルを1行ごとに分割
       const splitOneLine = response.data.split('\n');
 
       // 取得したい情報を配列にオブジェクトとして格納（日付、性別、年齢）
@@ -64,51 +65,55 @@ export default {
           date: splitOneLine[i].split(',')[4],
           gender: splitOneLine[i].split(',')[9],
           age: splitOneLine[i].split(',')[8]
-        })
+        });
       }
 
-      // 日付を取得（直近30日を取得、重複を削除）
+      // 【日付】を取得
       let dateArray = []
       array.map((value) => {
         dateArray.push(value.date)
       });
+
+      // 直近15日を取得、重複を削除
       const latest = dateArray.filter((x, i, self) => {
         return self.indexOf(x) === i;
       }).slice(-15);
 
-      // 直近30日の全てのデータ配列を取得
+      // 直近15日の全てのデータ配列を取得
       const latestData = array.filter((value) => {
         return value.date >= latest[0]
       });
 
+      // 日毎の【性別】を全てgenderに格納 → gender: "女性男性男性男性男性男性女性女性男性"
       const group = latestData.reduce((result, current) => {
         const element = result.find((p) => p.date === current.date);
         if (element) {
-          element.count ++; // count
-          element.gender += current.gender; // sum
+          element.gender += current.gender;
         } else {
           result.push({
             date: current.date,
-            count: 1,
             gender: current.gender
           });
         }
         return result;
       }, []);
 
+      // 配列に分割 → ["女性", "男性", "女性", "男性", "女性"]
       const gender = group.map(value => {
         return value.gender.match(/.{2}/g)
-      })
+      });
 
+      // 男女別に日毎集計
+      // 0: {value: "男性", count: 6}
+      // 1: {value: "女性", count: 3}
       const genderTaxonomy = gender.map(value => {
         return countArray(value)
-      })
+      });
 
+      // 男女の感染者数をそれぞれの配列に格納
       let maleCount = []
       let femaleCount = []
       genderTaxonomy.map((value) => {
-
-        console.log(value)
 
         const countUp = (gender, array) => {
           if(value[0] === undefined || value[1] === undefined && value[0].value !== gender) {
@@ -126,23 +131,23 @@ export default {
           countUp('女性', femaleCount)
           countUp('男性', maleCount)
         }
-      })
-      console.log(maleCount)
+      });
 
+      // data配列に男女それぞれの集計数を反映
       this.data.datasets[0].data = maleCount
       this.data.datasets[1].data = femaleCount
 
       // 日付フォーマットを変更
       const formatDate = group.map(value => {
         return moment(value.date, "YYYY-MM-DD").format('M/D')
-      })
+      });
       this.data.labels = formatDate
     }
   },
   mounted () {
     axios.get('/data/130001_tokyo_covid19_patients.csv')
     .then(response => {
-      this.setDate(response)
+      this.setData(response)
     })
     .finally(() => {
       this.renderChart(this.data, this.options)
