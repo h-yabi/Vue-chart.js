@@ -1,9 +1,9 @@
 
 <script>
-import { Bar } from 'vue-chartjs';
-import axios from 'axios';
+import { Bar } from 'vue-chartjs'
+import axios from 'axios'
 import moment from 'moment'
-import countArray from 'count-array-values';
+import countArray from 'count-array-values'
 
 export default {
   extends: Bar,
@@ -15,7 +15,7 @@ export default {
         datasets: [
           {
             label: '男性',
-            data: [10, 30, 20, 30, 50, 10],
+            data: [],
             backgroundColor: 'rgba(54, 162, 235, 0.5)',
             fill: false,
             type: 'bar',
@@ -23,7 +23,7 @@ export default {
           },
           {
             label: '女性',
-            data: [20, 60, 10, 30, 30, 40],
+            data: [],
             backgroundColor: 'rgba(255, 99, 132, 0.5)',
             fill: false,
             type: 'bar',
@@ -37,12 +37,10 @@ export default {
             scaleLabel: {
               display: true,
               fontColor: "#999",
-              labelString: "日付（直近30日）"
+              labelString: "日付"
             },
             stacked: true,
             ticks: {
-              // 下記のように固定値ではなく、
-              // データに応じて算出するのがいいと思います
               max: 24,
               stepSize: 4,
             }
@@ -59,6 +57,7 @@ export default {
       // 1行ごとの取得
       const splitOneLine = response.data.split('\n');
 
+      // 取得したい情報を配列にオブジェクトとして格納（日付、性別、年齢）
       let array = []
       for(let i = 1; i < splitOneLine.length - 1; i++) {
         array.push({
@@ -75,7 +74,7 @@ export default {
       });
       const latest = dateArray.filter((x, i, self) => {
         return self.indexOf(x) === i;
-      }).slice(-30);
+      }).slice(-15);
 
       // 直近30日の全てのデータ配列を取得
       const latestData = array.filter((value) => {
@@ -84,7 +83,6 @@ export default {
 
       const group = latestData.reduce((result, current) => {
         const element = result.find((p) => p.date === current.date);
-        // console.log(element)
         if (element) {
           element.count ++; // count
           element.gender += current.gender; // sum
@@ -97,27 +95,42 @@ export default {
         }
         return result;
       }, []);
-      console.log(group)
 
       const gender = group.map(value => {
         return value.gender.match(/.{2}/g)
       })
-      console.log(gender)
-
-      // const genderTaxonomy = countArray(gender[0])
 
       const genderTaxonomy = gender.map(value => {
         return countArray(value)
       })
-      console.log(genderTaxonomy)
 
+      let maleCount = []
+      let femaleCount = []
+      genderTaxonomy.map((value) => {
 
+        console.log(value)
 
-      // const genderTaxonomy = gender.reduce((a, b) => {
-      //   console.log(a + b)
-      // })
+        const countUp = (gender, array) => {
+          if(value[0] === undefined || value[1] === undefined && value[0].value !== gender) {
+            array.push(0)
+          } else {
+            if(value[0].value === gender) {
+              array.push(value[0].count)
+            } else if(value[1].value === gender) {
+              array.push(value[1].count)
+            }
+          }
+        }
 
+        if(value.length === 2 || value.length === 1) {
+          countUp('女性', femaleCount)
+          countUp('男性', maleCount)
+        }
+      })
+      console.log(maleCount)
 
+      this.data.datasets[0].data = maleCount
+      this.data.datasets[1].data = femaleCount
 
       // 日付フォーマットを変更
       const formatDate = group.map(value => {
@@ -139,5 +152,4 @@ export default {
 </script>
 
 <style scoped>
-
 </style>

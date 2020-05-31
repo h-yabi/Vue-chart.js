@@ -1,6 +1,6 @@
 <template>
   <div id="app">
-    <h1>新型コロナ陽性患者数の推移</h1>
+    <h1>【東京都】<br>新型コロナ陽性患者数の集計<br>（直近15日）</h1>
     <chart></chart>
   </div>
 </template>
