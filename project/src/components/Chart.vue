@@ -16,7 +16,7 @@ export default {
           {
             label: '男性',
             data: [],
-            backgroundColor: 'rgba(54, 162, 235, 0.5)',
+            backgroundColor: 'rgba(0, 108, 255, 0.4)',
             fill: false,
             type: 'bar',
             lineTension: 0.3,
@@ -24,7 +24,7 @@ export default {
           {
             label: '女性',
             data: [],
-            backgroundColor: 'rgba(255, 99, 132, 0.5)',
+            backgroundColor: 'rgba(255, 0, 0, 0.4)',
             fill: false,
             type: 'bar',
             lineTension: 0.3,
