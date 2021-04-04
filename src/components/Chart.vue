@@ -149,7 +149,9 @@ export default {
     }
   },
   mounted () {
-    axios.get('https://stopcovid19.metro.tokyo.lg.jp/data/130001_tokyo_covid19_patients.csv', this.headers)
+    const url = 'https://stopcovid19.metro.tokyo.lg.jp';
+
+    axios.get(`/cors-proxy/${url}/data/130001_tokyo_covid19_patients.csv`)
     .then(response => {
       console.log(response)
       this.setData(response)

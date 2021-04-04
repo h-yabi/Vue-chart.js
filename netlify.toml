@@ -1,3 +1,5 @@
-[build]
-  command = "npm run build"
-  functions = "dist/api"
+[[redirects]]
+  from = "/cors-proxy/*"
+  to = ":splat"
+  status = 200
+  force = true
