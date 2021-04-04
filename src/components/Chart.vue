@@ -149,7 +149,7 @@ export default {
     }
   },
   mounted () {
-    axios.get('/data/130001_tokyo_covid19_patients.csv', this.headers)
+    axios.get('https://stopcovid19.metro.tokyo.lg.jp/data/130001_tokyo_covid19_patients.csv', this.headers)
     .then(response => {
       console.log(response)
       this.setData(response)
