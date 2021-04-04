@@ -1,5 +1,5 @@
 module.exports = {
-  publicPath: '/Vue-chart.js/',
+  publicPath: '/',
   outputDir: 'docs',
   pages: {
     index: {
