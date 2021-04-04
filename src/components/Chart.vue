@@ -151,6 +151,7 @@ export default {
   mounted () {
     axios.get('/data/130001_tokyo_covid19_patients.csv', this.headers)
     .then(response => {
+      console.log(response)
       this.setData(response)
     })
     .finally(() => {
