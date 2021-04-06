@@ -50,46 +50,36 @@ export default {
           }]
         },
       },
-      headers: {
-          'Content-Type': 'application/json;charset=UTF-8',
-          'Access-Control-Allow-Origin': '*',
-      }
     }
   },
   methods: {
     setData (response) {
 
       // csvファイルを1行ごとに分割
-      const splitOneLine = response.data.split('\n');
+      const splitOneLine = response.data.split('\n')
+
+
+      // 現在日の【30日前】の日付を取得
+      // ※APIが当日データを提供していないため、31日としている
+      const getDate = moment().subtract(31, "days").format("Y-MM-DD")
+
 
       // 取得したい情報を配列にオブジェクトとして格納（日付、性別、年齢）
       let array = []
       for(let i = 1; i < splitOneLine.length - 1; i++) {
-        array.push({
-          date: splitOneLine[i].split(',')[4],
-          gender: splitOneLine[i].split(',')[9],
-          age: splitOneLine[i].split(',')[8]
-        });
+        if(moment(splitOneLine[i].split(',')[4]).isAfter(getDate)) {
+          array.push({
+            date: splitOneLine[i].split(',')[4],
+            gender: splitOneLine[i].split(',')[9],
+            age: splitOneLine[i].split(',')[8]
+          });
+        }
       }
+      console.log(array)
 
-      // 【日付】を取得
-      let dateArray = []
-      array.map((value) => {
-        dateArray.push(value.date)
-      });
-
-      // 直近15日を取得、重複を削除
-      const latest = dateArray.filter((x, i, self) => {
-        return self.indexOf(x) === i;
-      }).slice(-15);
-
-      // 直近15日の全てのデータ配列を取得
-      const latestData = array.filter((value) => {
-        return value.date >= latest[0]
-      });
 
       // 日毎の【性別】を全てgenderに格納 → gender: "女性男性男性男性男性男性女性女性男性"
-      const group = latestData.reduce((result, current) => {
+      const group = array.reduce((result, current) => {
         const element = result.find((p) => p.date === current.date);
         if (element) {
           element.gender += current.gender;
@@ -101,11 +91,14 @@ export default {
         }
         return result;
       }, []);
+      console.log(group)
+
 
       // 配列に分割 → ["女性", "男性", "女性", "男性", "女性"]
       const gender = group.map(value => {
         return value.gender.match(/.{2}/g)
       });
+
 
       // 男女別に日毎集計
       // 0: {value: "男性", count: 6}
@@ -113,6 +106,7 @@ export default {
       const genderTaxonomy = gender.map(value => {
         return countArray(value)
       });
+
 
       // 男女の感染者数をそれぞれの配列に格納
       let maleCount = []
@@ -149,11 +143,12 @@ export default {
     }
   },
   mounted () {
-    const url = 'https://stopcovid19.metro.tokyo.lg.jp';
+    // const url = 'https://stopcovid19.metro.tokyo.lg.jp';
+    // axios.get(`/cors-proxy/${url}/data/130001_tokyo_covid19_patients.csv`)
 
-    axios.get(`/cors-proxy/${url}/data/130001_tokyo_covid19_patients.csv`)
+    axios.get('/data/130001_tokyo_covid19_patients.csv')
     .then(response => {
-      console.log(response)
+
       this.setData(response)
     })
     .finally(() => {
