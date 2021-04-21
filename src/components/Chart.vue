@@ -75,7 +75,7 @@ export default {
           });
         }
       }
-      console.log(array)
+      // console.log(array)
 
 
       // 日毎の【性別】を全てgenderに格納 → gender: "女性男性男性男性男性男性女性女性男性"
@@ -91,7 +91,7 @@ export default {
         }
         return result;
       }, []);
-      console.log(group)
+      // console.log(group)
 
 
       // 配列に分割 → ["女性", "男性", "女性", "男性", "女性"]
