@@ -163,10 +163,10 @@ export default {
     }
   },
   mounted () {
-    // const url = 'https://stopcovid19.metro.tokyo.lg.jp';
-    // axios.get(`/cors-proxy/${url}/data/130001_tokyo_covid19_patients.csv`)
+    const url = 'https://stopcovid19.metro.tokyo.lg.jp';
+    axios.get(`/cors-proxy/${url}/data/130001_tokyo_covid19_patients.csv`)
 
-    axios.get('/data/130001_tokyo_covid19_patients.csv')
+    // axios.get('/data/130001_tokyo_covid19_patients.csv')
     .then(response => {
 
       this.setData(response)
