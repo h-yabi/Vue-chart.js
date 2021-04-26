@@ -18,7 +18,7 @@ export default {
 
 <style lang="sass">
 #app
-  max-width: 800px
+  max-width: 600px
   font-family: Avenir, Helvetica, Arial, sans-serif
   -webkit-font-smoothing: antialiased
   -moz-osx-font-smoothing: grayscale

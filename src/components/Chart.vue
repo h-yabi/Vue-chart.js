@@ -17,14 +17,25 @@ export default {
             label: '男性',
             data: [],
             backgroundColor: 'rgba(0, 108, 255, 0.4)',
+            borderColor: 'rgba(0, 108, 255, 0.4)',
             fill: false,
-            type: 'bar',
-            lineTension: 0.3,
+            type: 'line',
+            lineTension: 0.5,
           },
           {
             label: '女性',
             data: [],
             backgroundColor: 'rgba(255, 0, 0, 0.4)',
+            borderColor: 'rgba(255, 0, 0, 0.4)',
+            fill: false,
+            type: 'line',
+            lineTension: 0.3,
+          },
+          {
+            label: '合計',
+            data: [],
+            backgroundColor: 'rgba(210, 210, 210, 0.9)',
+            borderColor: 'rgba(210, 210, 210, 0.9)',
             fill: false,
             type: 'bar',
             lineTension: 0.3,
@@ -33,6 +44,7 @@ export default {
       },
       options: {
         scales: {
+          // 横ラベル設定
           xAxes: [{
             scaleLabel: {
               display: true,
@@ -45,9 +57,12 @@ export default {
               stepSize: 4,
             }
           }],
-          yAxes: [{
-            stacked: true
-          }]
+        },
+        responsive: true,
+        plugins: {
+          legend: {
+            position: 'top',
+          },
         },
       },
     }
@@ -99,6 +114,10 @@ export default {
         return value.gender.match(/.{2}/g)
       });
 
+      // 日毎の合計数を集計
+      const totalCount = gender.map(value => {
+        return value.length
+      })
 
       // 男女別に日毎集計
       // 0: {value: "男性", count: 6}
@@ -134,6 +153,7 @@ export default {
       // data配列に男女それぞれの集計数を反映
       this.data.datasets[0].data = maleCount
       this.data.datasets[1].data = femaleCount
+      this.data.datasets[2].data = totalCount
 
       // 日付フォーマットを変更
       const formatDate = group.map(value => {
@@ -143,10 +163,10 @@ export default {
     }
   },
   mounted () {
-    const url = 'https://stopcovid19.metro.tokyo.lg.jp';
-    axios.get(`/cors-proxy/${url}/data/130001_tokyo_covid19_patients.csv`)
+    // const url = 'https://stopcovid19.metro.tokyo.lg.jp';
+    // axios.get(`/cors-proxy/${url}/data/130001_tokyo_covid19_patients.csv`)
 
-    // axios.get('/data/130001_tokyo_covid19_patients.csv')
+    axios.get('/data/130001_tokyo_covid19_patients.csv')
     .then(response => {
 
       this.setData(response)
